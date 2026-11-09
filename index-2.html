@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Eukaryotic Cell Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: lab-worksheet game. Big header card with player name, round tiles, figure + task panel. Textbook organelle colors, rounded pieces, large tap targets. */
+:root{
+  --paper:#EAF0F2; --surface:#FFFFFF; --ink:#1B2A33; --muted:#5C6E78; --rule:#D3DEE3;
+  --accent:#0E7C8B; --accent-ink:#FFFFFF; --accent-soft:#D5EEF1;
+  --sel:#F2A922; --sel-soft:#FFF1D2;
+  --good:#23945A; --good-soft:#DDF3E5; --bad:#D9483B; --bad-soft:#FBE1DD;
+  --cyto:#FBE3C7; --memb:#4E9AB0; --nuc:#C9D2F2; --nucleolus:#5B5FB8; --er:#4D86D6; --er-in:#D9E6FA;
+  --mito:#E46F5E; --mito-in:#FBD6CF; --chl:#4FA54F; --chl-in:#CDEBC6; --golgi:#E6A532; --lyso:#9A68C8; --ribo:#2C3A46; --fil:#C08D57;
+  --wall-top:#E7B98C; --wall-bot:#A9683F; --shadow:#3B2414; --cyto-hi:#FFF4E6;
+  --nuc-hi:#EEF1FF; --nuc-dk:#7F89C9; --nucleolus-hi:#A3A6EC; --nucleolus-dk:#373A80; --er-dk:#2A5797;
+  --mito-hi:#FBB4A7; --mito-dk:#A2412F; --chl-hi:#9AD594; --chl-dk:#2C6A2E; --golgi-hi:#F8D58C; --golgi-dk:#A27013;
+  --lyso-hi:#D6BBF2; --lyso-dk:#5F3790; --ribo-hi:#7C90A0;
+  --display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", Verdana, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111A1F; --surface:#1A262D; --ink:#E8F0F2; --muted:#9DB0B9; --rule:#2B3B44;
+  --accent:#4FC3D2; --accent-ink:#0E1A1F; --accent-soft:#163A41;
+  --sel:#F5BA45; --sel-soft:#3D3115;
+  --good:#5DCF8D; --good-soft:#183526; --bad:#F27D70; --bad-soft:#41211D;
+  --cyto:#3A2E22; --memb:#5BA9BF; --nuc:#2D3459; --nucleolus:#9EA2F0; --er:#5E98E6; --er-in:#1C2C44;
+  --mito:#E3806F; --mito-in:#4A2621; --chl:#62B562; --chl-in:#1F3A1E; --golgi:#E8B04A; --lyso:#B48AE0; --ribo:#D4DEE5; --fil:#A87C4F;
+  --wall-top:#8C5E3C; --wall-bot:#4A2C18; --shadow:#000000; --cyto-hi:#4E3D2C;
+  --nuc-hi:#55609C; --nuc-dk:#1B2042; --nucleolus-hi:#CACCFB; --nucleolus-dk:#5D61BA; --er-dk:#284F87;
+  --mito-hi:#F5AB9D; --mito-dk:#7E3529; --chl-hi:#9AD596; --chl-dk:#2D5A2A; --golgi-hi:#F6D594; --golgi-dk:#86621E;
+  --lyso-hi:#DCC4F4; --lyso-dk:#5E4085; --ribo-hi:#FFFFFF;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111A1F; --surface:#1A262D; --ink:#E8F0F2; --muted:#9DB0B9; --rule:#2B3B44;
+  --accent:#4FC3D2; --accent-ink:#0E1A1F; --accent-soft:#163A41;
+  --sel:#F5BA45; --sel-soft:#3D3115;
+  --good:#5DCF8D; --good-soft:#183526; --bad:#F27D70; --bad-soft:#41211D;
+  --cyto:#3A2E22; --memb:#5BA9BF; --nuc:#2D3459; --nucleolus:#9EA2F0; --er:#5E98E6; --er-in:#1C2C44;
+  --mito:#E3806F; --mito-in:#4A2621; --chl:#62B562; --chl-in:#1F3A1E; --golgi:#E8B04A; --lyso:#B48AE0; --ribo:#D4DEE5; --fil:#A87C4F;
+  --wall-top:#8C5E3C; --wall-bot:#4A2C18; --shadow:#000000; --cyto-hi:#4E3D2C;
+  --nuc-hi:#55609C; --nuc-dk:#1B2042; --nucleolus-hi:#CACCFB; --nucleolus-dk:#5D61BA; --er-dk:#284F87;
+  --mito-hi:#F5AB9D; --mito-dk:#7E3529; --chl-hi:#9AD596; --chl-dk:#2D5A2A; --golgi-hi:#F6D594; --golgi-dk:#86621E;
+  --lyso-hi:#DCC4F4; --lyso-dk:#5E4085; --ribo-hi:#FFFFFF;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:22px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
+
+header.top{background:var(--accent);color:var(--accent-ink);border-radius:var(--r);padding:20px 22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 24px;align-items:center}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.85}
+h1{font:800 clamp(28px,4.6vw,46px)/1.02 var(--display);margin:8px 0 0;letter-spacing:-.02em;text-wrap:balance}
+.lede{margin:8px 0 0;max-width:60ch;opacity:.92}
+.total{text-align:center;background:var(--surface);color:var(--ink);border-radius:12px;padding:12px 18px;min-width:120px}
+.total small{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.total b{display:block;font:800 40px/1.05 var(--display);font-variant-numeric:tabular-nums;color:var(--accent)}
+.total span{font:500 12px var(--mono);color:var(--muted)}
+header.top h1{font-size:clamp(24px,3.4vw,34px)}
+.player{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;font-weight:700}
+.player .who-chip{background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 14px;font-size:14px}
+.player button{background:none;border:0;color:inherit;text-decoration:underline;text-underline-offset:3px;font-size:14px;padding:6px 4px;opacity:.9}
+@media (max-width:560px){header.top{grid-template-columns:minmax(0,1fr)}.total{justify-self:start;display:flex;align-items:baseline;gap:10px}.total b{display:inline}}
+
+/* start page */
+.start{max-width:620px;margin:6vh auto 0;width:100%;display:flex;flex-direction:column;gap:14px}
+.start-card{background:var(--accent);color:var(--accent-ink);border-radius:20px;padding:28px 26px 26px;display:flex;flex-direction:column;gap:18px}
+.start-card h1{font-size:clamp(32px,6vw,50px);margin:10px 0 0}
+.start-card .lede{margin:10px 0 0}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.steps li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 14px}
+.steps .sn{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:800 14px var(--display)}
+.steps b{font-family:var(--display)}
+.steps .pts{font:600 12px var(--mono);color:var(--muted)}
+.start form{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.field input{background:var(--surface);color:var(--ink);border:2px solid transparent;border-radius:12px;padding:12px 14px;font-size:17px;min-height:50px;width:100%;min-width:0}
+.field input::placeholder{color:var(--muted)}
+.field input[aria-invalid="true"]{border-color:var(--bad)}
+.start form .go{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.start .btn.big{background:var(--ink);color:var(--surface);border-color:var(--ink);box-shadow:0 3px 0 rgba(0,0,0,.25);font-size:17px;padding:13px 28px;min-height:52px}
+.start .err{font-weight:700;font-size:14px}
+.start .alt{display:flex;justify-content:center}
+.start .alt button{background:none;border:0;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:8px}
+@media (max-width:480px){.start form{grid-template-columns:minmax(0,1fr)}.start-card{padding:22px 18px}}
+
+nav.rounds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+nav.rounds button{border:2px solid var(--rule);background:var(--surface);border-radius:var(--r);text-align:left;padding:12px 14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:center;min-width:0}
+nav.rounds .num{grid-row:span 2;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:800 18px var(--display);background:var(--paper);color:var(--muted)}
+nav.rounds .rt{font:700 16px/1.2 var(--display);min-width:0}
+nav.rounds .rs{font:500 12px/1.3 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+nav.rounds button[aria-selected="true"]{border-color:var(--accent);box-shadow:0 3px 0 var(--accent)}
+nav.rounds button[aria-selected="true"] .num{background:var(--accent);color:var(--accent-ink)}
+nav.rounds button.done .num{background:var(--good);color:var(--surface)}
+@media (max-width:620px){nav.rounds button{grid-template-columns:minmax(0,1fr);text-align:center;justify-items:center;padding:10px 6px}nav.rounds .num{grid-row:auto}nav.rounds .rt{font-size:13px}}
+
+main.stage{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:18px;align-items:start}
+main.stage.wide{grid-template-columns:minmax(0,1fr)}
+main.stage.wide figure{display:none}
+@media (max-width:900px){main.stage{grid-template-columns:minmax(0,1fr)}}
+
+figure{margin:0;background:var(--surface);border-radius:var(--r);padding:14px 14px 12px;border:2px solid var(--rule)}
+figure svg{width:100%;height:auto;display:block;touch-action:manipulation}
+figcaption{font-size:13.5px;line-height:1.45;color:var(--muted);margin-top:8px;padding-top:10px;border-top:2px dashed var(--rule)}
+figcaption b{color:var(--ink)}
+
+.panel{display:flex;flex-direction:column;gap:14px;min-width:0;background:var(--surface);border-radius:var(--r);border:2px solid var(--rule);padding:18px}
+.panel h2{font:800 25px/1.15 var(--display);margin:0;letter-spacing:-.01em}
+.panel .how{margin:6px 0 0;color:var(--muted);font-size:15px}
+.bank{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:12px;border-radius:12px;background:var(--sel-soft);border:2px dashed var(--sel)}
+.bank:empty::before{content:"All labels placed. Hit Check when you’re ready.";color:var(--muted);font-size:14px;align-self:center}
+.chip{border:2px solid var(--ink);background:var(--surface);padding:8px 14px;font-size:15px;font-weight:700;line-height:1.1;border-radius:999px;user-select:none;min-height:40px;transition:transform .12s}
+.chip:hover{transform:translateY(-2px)}
+.chip[aria-pressed="true"]{background:var(--sel);border-color:var(--sel);color:#1B2A33;transform:translateY(-2px);box-shadow:0 3px 0 var(--ink)}
+.slots{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 10px}
+.slots li{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center;gap:8px}
+.slots .n{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--surface);display:grid;place-items:center;font:600 13px var(--mono)}
+.slot{border:2px solid var(--rule);background:var(--paper);border-radius:10px;text-align:left;padding:7px 10px;font-size:15px;font-weight:700;min-width:0;width:100%;min-height:42px}
+.slot.empty{font-weight:400;color:var(--muted)}
+.slot.empty::after{content:"?";font:600 14px var(--mono);opacity:.6}
+.slot.armed{border-color:var(--sel);border-style:dashed;background:var(--sel-soft)}
+.slot.over{border-color:var(--accent);background:var(--accent-soft)}
+.slot.ok{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.slot.bad{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.slot.bad .was{text-decoration:line-through;font-weight:400}
+.fix{display:block;color:var(--ink);font-weight:700;font-size:13.5px;margin-top:2px}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:2px solid var(--ink);background:var(--ink);color:var(--surface);padding:11px 20px;font-weight:700;font-size:15px;border-radius:999px;min-height:46px;box-shadow:0 3px 0 var(--accent);transition:transform .1s}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--accent)}
+.btn.ghost{background:none;color:var(--ink);box-shadow:none}
+.btn:disabled{opacity:.35;cursor:default;box-shadow:none}
+.result{font:600 14px/1.4 var(--mono);color:var(--muted)}
+.result b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+.r2top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.streak{font:600 13px var(--mono);background:var(--sel-soft);color:var(--ink);border:2px solid var(--sel);border-radius:999px;padding:4px 12px}
+.clue{background:var(--accent-soft);border-radius:12px;padding:18px 18px 20px;position:relative}
+.clue .k{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.clue p{font:700 22px/1.3 var(--display);margin:8px 0 0;text-wrap:balance}
+.pad{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.pad button{border:2px solid var(--rule);background:var(--paper);min-height:46px;font:600 17px var(--mono);border-radius:10px;transition:transform .1s}
+.pad button:hover:not(:disabled){border-color:var(--ink);transform:translateY(-2px)}
+.pad button.ok{background:var(--good);border-color:var(--good);color:var(--surface)}
+.pad button.bad{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.pad button:disabled{cursor:default}
+.fb{padding:14px 16px;border-radius:12px;background:var(--paper);font-size:15px}
+.fb.ok{background:var(--good-soft)} .fb.bad{background:var(--bad-soft)}
+.fb .tag{display:inline-block;font:800 13px var(--display);text-transform:uppercase;letter-spacing:.06em;padding:3px 10px;border-radius:999px;margin-right:6px;color:var(--surface)}
+.fb.ok .tag{background:var(--good)} .fb.bad .tag{background:var(--bad)}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dots i{width:22px;height:8px;border-radius:999px;background:var(--rule)}
+.dots i.ok{background:var(--good)} .dots i.bad{background:var(--bad)} .dots i.cur{background:var(--sel)}
+
+.tablewrap{overflow-x:auto;border-radius:12px;border:2px solid var(--rule)}
+table.sort{border-collapse:collapse;width:100%;min-width:520px}
+table.sort th,table.sort td{padding:10px 12px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:middle}
+table.sort tbody tr:last-child td{border-bottom:0}
+table.sort thead th{font:700 15px/1.2 var(--display);background:var(--paper)}
+table.sort thead th.c{text-align:center;width:104px}
+table.sort thead .gA{color:var(--chl)} table.sort thead .gF{color:var(--golgi)} table.sort thead .gP{color:var(--lyso)}
+table.sort td{font-weight:700}
+table.sort td.c{text-align:center}
+table.sort .why{display:block;color:var(--muted);font-size:14px;font-weight:400;margin-top:4px}
+table.sort tr.ok td{background:var(--good-soft)}
+table.sort tr.bad td{background:var(--bad-soft)}
+.tog{width:44px;height:44px;border:2px solid var(--muted);background:var(--surface);border-radius:12px;font:800 20px var(--display);transition:transform .1s}
+.tog:hover:not(:disabled){transform:scale(1.06)}
+.tog[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tog.miss{border:2px dashed var(--bad);background:var(--surface)}
+.tog.extra{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.legend{font-size:13.5px;color:var(--muted)}
+
+#summary{border-radius:var(--r);background:var(--ink);color:var(--surface);padding:22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 24px;align-items:center}
+#summary .big{font:800 60px/1 var(--display);font-variant-numeric:tabular-nums;grid-row:span 3;color:var(--sel)}
+#summary .big span{font-size:24px;opacity:.7}
+#summary .rank{font:800 26px/1.15 var(--display)}
+#summary .verdict{opacity:.9}
+#summary .detail{font:500 13px/1.5 var(--mono);opacity:.75}
+@media (max-width:520px){#summary{grid-template-columns:minmax(0,1fr)}#summary .big{grid-row:auto}}
+
+/* diagram */
+.d-cyto{fill:var(--cyto)} .d-memb{fill:none;stroke:var(--memb);stroke-width:7} .d-memb-in{fill:none;stroke:var(--memb);stroke-width:1.2;opacity:.6}
+.d-flag{fill:none;stroke:var(--memb);stroke-width:5;stroke-linecap:round}
+.d-fil{fill:none;stroke:var(--fil);stroke-width:1.3}
+.d-er{fill:none;stroke:var(--er);stroke-width:8;stroke-linecap:round} .d-er-in{fill:none;stroke:var(--er-in);stroke-width:2.6;stroke-linecap:round}
+.d-ribo{fill:var(--ribo)}
+.d-nuc{fill:var(--nuc)} .d-env{fill:none;stroke:var(--nucleolus);stroke-width:2.6;opacity:.75} .d-pore{stroke:var(--cyto);stroke-width:4.5}
+.d-nucleolus{fill:var(--nucleolus)} .d-chrom{fill:var(--nucleolus);opacity:.3}
+.d-mito{fill:var(--mito)} .d-mito-in{fill:var(--mito-in)} .d-cristae{fill:none;stroke:var(--mito);stroke-width:1.8;stroke-linejoin:round}
+.d-chl{fill:var(--chl)} .d-chl-in{fill:var(--chl-in)} .d-grana{fill:var(--chl)}
+.d-golgi{fill:none;stroke:var(--golgi);stroke-width:6;stroke-linecap:round} .d-golgi-v{fill:var(--golgi)}
+.d-lyso{fill:var(--lyso)} .d-lyso-in{fill:var(--cyto);opacity:.8}
+.d-mt{stroke:var(--ribo);stroke-width:1.6;stroke-linecap:round}
+.d-lead{stroke:var(--muted);stroke-width:1} .d-pt{fill:var(--ink)}
+.mk{cursor:pointer} .mk .hit{fill:transparent}
+.mk .c{fill:var(--surface);stroke:var(--ink);stroke-width:2;transition:fill .15s}
+.mk text{font:600 13px var(--mono);fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.mk.filled .c{fill:var(--ink)} .mk.filled text{fill:var(--surface)}
+.mk.armed .c{stroke:var(--sel);stroke-width:3.5}
+.mk:hover .c{stroke-width:3.5}
+.mk.ok .c,.mk.reveal .c{fill:var(--good);stroke:var(--good)} .mk.ok text,.mk.reveal text{fill:var(--surface)}
+.mk.bad .c{fill:var(--bad);stroke:var(--bad)} .mk.bad text{fill:var(--surface)}
+.mk.reveal .c{animation:pop .5s ease}
+@keyframes pop{0%{r:12}40%{r:17}100%{r:13}}
+.lead-on{stroke:var(--sel);stroke-width:2.4}
+/* leaderboard */
+.lbbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.lbbar select{font:inherit;border:2px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:10px;padding:8px 12px;min-height:44px}
+.lbwrap{overflow-x:auto;border-radius:12px;border:2px solid var(--rule)}
+table.lb{border-collapse:collapse;width:100%;min-width:420px}
+table.lb th,table.lb td{padding:10px 12px;border-bottom:1px solid var(--rule);text-align:left}
+table.lb tbody tr:last-child td{border-bottom:0}
+table.lb thead th{font:700 14px var(--display);background:var(--paper)}
+table.lb td.num,table.lb th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono)}
+table.lb td.nm{font-weight:700}
+table.lb tr.me td{background:var(--sel-soft)}
+.rk{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;font:700 13px var(--mono);background:var(--paper)}
+.rk.r1{background:var(--sel);color:#1B2A33}.rk.r2{background:var(--rule)}.rk.r3{background:var(--golgi-dk);color:#fff}
+.note{padding:14px 16px;border-radius:12px;background:var(--paper);color:var(--muted);font-size:15px}
+.note.bad{background:var(--bad-soft);color:var(--ink)}
+#summary .sub{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px}
+#summary .btn{background:var(--sel);border-color:var(--sel);color:#1B2A33;box-shadow:none}
+#summary .btn.ghost{background:none;border-color:var(--surface);color:var(--surface)}
+#summary .msg{font:500 13px var(--mono);opacity:.85}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+
+</head>
+<body>
+<section class="start" id="startPage">
+  <div class="start-card">
+    <div>
+      <div class="eyebrow">Microbiology 10 · Check Your Understanding</div>
+      <h1>Inside a Eukaryotic Microbe</h1>
+      <p class="lede">Three quick rounds. Name the parts, figure out what they do, then decide which microbes actually have them. The timer starts when you hit Start.</p>
+    </div>
+    <ol class="steps">
+      <li><span class="sn">1</span><b>Name it</b><span class="pts">15 pts</span></li>
+      <li><span class="sn">2</span><b>What does it do?</b><span class="pts">9 pts</span></li>
+      <li><span class="sn">3</span><b>Who has it?</b><span class="pts">8 pts</span></li>
+    </ol>
+    <form id="startForm" novalidate>
+      <div class="field"><label for="stuName">Your name</label><input id="stuName" placeholder="e.g. Juan Dela Cruz" autocomplete="off" maxlength="40"></div>
+      <div class="field"><label for="stuSec">Section</label><input id="stuSec" placeholder="e.g. Thymine" autocomplete="off" maxlength="20"></div>
+      <div class="go"><button class="btn big" type="submit">Start →</button><span class="err" id="startErr" role="alert"></span></div>
+    </form>
+  </div>
+  <div class="alt"><button type="button" id="peekLB">View the leaderboard</button></div>
+</section>
+
+<div class="wrap" id="app" hidden>
+  <header class="top">
+    <div>
+      <div class="eyebrow">Microbiology 10 · Check Your Understanding</div>
+      <h1>Inside a Eukaryotic Microbe</h1>
+      <div class="player"><span class="who-chip" id="whoChip"></span><button type="button" id="changeWho">Change name</button></div>
+    </div>
+    <div class="total"><small>Score</small><b id="totalScore">0</b><span>out of 32</span></div>
+  </header>
+
+  <nav class="rounds" role="tablist" id="tabs"></nav>
+
+  <main class="stage" id="stage">
+    <figure>
+      <svg id="cell" viewBox="0 0 760 506" role="img" aria-label="Cross-section of a microbial eukaryotic cell with 15 numbered structures"></svg>
+      <figcaption><b>Fig. A</b> A microbial eukaryote, cut open. Not every microbe has every part shown here, and the cell wall of fungi and algae isn’t drawn.</figcaption>
+    </figure>
+    <section class="panel" id="panel" aria-live="polite"></section>
+  </main>
+
+  <section id="summary" hidden></section>
+</div>
+
+<script>
+(function(){
+/* ======= SET THESE TWO VALUES (Supabase → Project Settings → API) ======= */
+const CONFIG={
+  SUPABASE_URL:'https://rnbacmatfibpwiutgpup.supabase.co/rest/v1/',        // e.g. https://abcdxyz.supabase.co
+  SUPABASE_ANON_KEY:'sb_publishable_ErG2BdS33jeCm_kN_AHk9w_Z1Zk2_4f',   // the "anon public" key (safe to put in a web page)
+  TABLE:'cell_scores'
+};
+/* ======================================================================= */
+const LB_ON=!!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_ANON_KEY);
+async function sb(path,opts){opts=opts||{};const k=CONFIG.SUPABASE_ANON_KEY;
+ const r=await fetch(CONFIG.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/'+path,{method:opts.method||'GET',body:opts.body,
+   headers:Object.assign({apikey:k,'Content-Type':'application/json'},/^eyJ/.test(k)?{Authorization:'Bearer '+k}:{},opts.headers||{})});
+ if(!r.ok){let t='';try{t=await r.text()}catch(e){}throw new Error(t||('HTTP '+r.status))}
+ return r.status===204||r.headers.get('content-length')==='0'?null:r.json().catch(()=>null)}
+const S=[
+ {id:'nucleolus', name:'Nucleolus', p:[315,230], m:[250,22]},
+ {id:'pore', name:'Nuclear pore', p:[343,184], m:[330,22]},
+ {id:'ser', name:'Smooth ER', p:[443,120], m:[440,22]},
+ {id:'mt', name:'Microtubules', p:[530,150], m:[735,90]},
+ {id:'mito', name:'Mitochondrion', p:[480,190], m:[735,150]},
+ {id:'lyso', name:'Lysosome', p:[585,235], m:[735,210]},
+ {id:'flag', name:'Flagellum', p:[690,243], m:[735,270]},
+ {id:'golgi', name:'Golgi complex', p:[493,280], m:[735,340]},
+ {id:'ribo', name:'Ribosomes', p:[560,340], m:[735,400]},
+ {id:'chl', name:'Chloroplast', p:[400,385], m:[450,490]},
+ {id:'memb', name:'Cytoplasmic membrane', p:[360,440], m:[360,490]},
+ {id:'env', name:'Nuclear envelope', p:[325,315], m:[270,490]},
+ {id:'mf', name:'Microfilaments', p:[126,310], m:[25,310]},
+ {id:'rer', name:'Rough ER', p:[196,245], m:[25,245]},
+ {id:'nucleus', name:'Nucleus', p:[268,272], m:[25,180]}
+];
+const byId=Object.fromEntries(S.map((s,i)=>[s.id,{...s,n:i+1}]));
+
+const CLUES=[
+ {a:'mito',t:'I make most of the cell’s ATP, and I even have my own DNA and 70S ribosomes.',w:'Mitochondria run aerobic respiration. Their own DNA and 70S ribosomes are evidence they were once free-living bacteria.'},
+ {a:'golgi',t:'I’m the cell’s shipping center. I modify, sort, and package proteins into vesicles.',w:'The Golgi complex takes vesicles from the ER, tags the proteins, and sends them where they need to go.'},
+ {a:'rer',t:'Ribosomes stud my surface. Proteins made here fold inside me before they’re exported.',w:'Rough ER is ER covered in ribosomes. It handles proteins for secretion or for membranes.'},
+ {a:'ser',t:'No ribosomes on me. I make lipids and help detoxify chemicals.',w:'Smooth ER builds lipids like phospholipids and sterols.'},
+ {a:'lyso',t:'I’m a bag of digestive enzymes that breaks down whatever the cell swallows.',w:'Lysosomes fuse with food vacuoles and keep their enzymes away from the rest of the cell.'},
+ {a:'nucleolus',t:'I have no membrane of my own. I make rRNA and build ribosome parts.',w:'The nucleolus is a dense spot inside the nucleus where rRNA genes are copied.'},
+ {a:'pore',t:'mRNA squeezes through me to get out of the nucleus.',w:'Nuclear pores are protein channels that cross both membranes of the nuclear envelope.'},
+ {a:'chl',t:'I turn light into chemical energy. Algae have me; fungi never do.',w:'Chloroplasts do photosynthesis on stacks of thylakoid membranes.'},
+ {a:'mt',t:'I’m a hollow tube made of tubulin. I hold the cell’s shape and power the flagellum.',w:'Microtubules (about 25 nm wide) are thicker than microfilaments, which are made of actin.'}
+];
+
+const R3=[
+ {id:'nuc',name:'Nucleus with nuclear envelope',a:'AFP',w:'Every eukaryote has one. That’s what makes it a eukaryote.'},
+ {id:'mito',name:'Mitochondria',a:'AFP',w:'Nearly all have them. A few anaerobic protozoa like Giardia keep only tiny leftovers called mitosomes.'},
+ {id:'r80',name:'80S ribosomes in the cytoplasm',a:'AFP',w:'All eukaryotes. The smaller 70S type only shows up inside mitochondria and chloroplasts.'},
+ {id:'chl',name:'Chloroplasts',a:'A',w:'Algae photosynthesize. Fungi and most protozoa have to eat their food.'},
+ {id:'wall',name:'Cell wall',a:'AF',w:'Algae and fungi have walls. Protozoa don’t, so many can change shape and engulf food.'},
+ {id:'chitin',name:'Chitin in the cell wall',a:'F',w:'Chitin is the fungal wall material, the same stuff in insect exoskeletons.'},
+ {id:'cellu',name:'Cellulose in the cell wall',a:'A',w:'Most algal walls are cellulose, like plants. True fungi use chitin instead.'},
+ {id:'pel',name:'Pellicle (flexible layer, no wall)',a:'P',w:'Protozoa such as Paramecium have one. It holds their shape but still lets them bend.'}
+];
+const G=[['A','Algae'],['F','Fungi'],['P','Protozoa']];
+
+const st={name:'',sec:'',round:0,t0:null,submitted:false,subMsg:'',lb:{rows:null,err:'',loading:false,sec:'all'},
+ r1:{place:{},sel:null,checked:false,score:null},
+ r2:{i:0,res:[],pick:null,score:null,streak:0,best:0},
+ r3:{pick:{},checked:false,score:null}};
+R3.forEach(r=>st.r3.pick[r.id]=new Set());
+const shuffled=S.map(s=>s.id).sort(()=>Math.random()-.5);
+const start=()=>{if(!st.t0)st.t0=Date.now()};
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- diagram ---------- */
+const P=(cx,cy,r,a)=>[cx+r*Math.cos(a*Math.PI/180),cy-r*Math.sin(a*Math.PI/180)];
+function arc(cx,cy,r,a0,a1){const[x0,y0]=P(cx,cy,r,a0),[x1,y1]=P(cx,cy,r,a1);return `M${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 ${a1-a0>180?1:0} 0 ${x1.toFixed(1)} ${y1.toFixed(1)}`}
+function ell(cx,cy,rx,ry,a0,a1){let pts=[];for(let a=a0;a<=a1;a+=3){pts.push((cx+rx*Math.cos(a*Math.PI/180)).toFixed(1)+','+(cy-ry*Math.sin(a*Math.PI/180)).toFixed(1))}return pts.join(' ')}
+function mito(cx,cy,rx,ry,rot){let z=`M${-rx+7} 0`;let k=0;for(let x=-rx+11;x<rx-6;x+=7){z+=` L${x} ${(k++%2?1:-1)*(ry-4)}`}
+ return `<g transform="translate(${cx} ${cy}) rotate(${rot})"><ellipse rx="${rx}" ry="${ry}" class="d-mito"/><ellipse rx="${rx-3}" ry="${ry-3}" class="d-mito-in"/><path d="${z}" class="d-cristae"/></g>`}
+function rg(id,a,b,c,cx,cy,r){return `<radialGradient id="${id}" cx="${cx||.35}" cy="${cy||.3}" r="${r||.8}"><stop offset="0" style="stop-color:var(${a})"/><stop offset=".55" style="stop-color:var(${b})"/><stop offset="1" style="stop-color:var(${c})"/></radialGradient>`}
+function tube(d,dk,body,hi,w){return `<path d="${d}" transform="translate(1.6 2.4)" style="fill:none;stroke:var(${dk});stroke-width:${w};stroke-linecap:round;opacity:.55"/><path d="${d}" style="fill:none;stroke:var(${body});stroke-width:${w};stroke-linecap:round"/><path d="${d}" transform="translate(-.6 -1.6)" style="fill:none;stroke:var(${hi});stroke-width:${Math.max(1.4,w/3.4)};stroke-linecap:round;opacity:.9"/>`}
+function drawCell(){
+ let s='<defs>'+rg('gCyto','--cyto-hi','--cyto','--cyto',.42,.32,.78)+rg('gNuc','--nuc-hi','--nuc','--nuc-dk')+rg('gNo','--nucleolus-hi','--nucleolus','--nucleolus-dk')
+  +rg('gMito','--mito-hi','--mito','--mito-dk')+rg('gChl','--chl-hi','--chl','--chl-dk')+rg('gLyso','--lyso-hi','--lyso','--lyso-dk')+rg('gGv','--golgi-hi','--golgi','--golgi-dk')+rg('gRibo','--ribo-hi','--ribo','--ribo')
+  +`<linearGradient id="gWall" x1="0" y1="0" x2="0" y2="1"><stop offset=".45" style="stop-color:var(--wall-top)"/><stop offset="1" style="stop-color:var(--wall-bot)"/></linearGradient>`
+  +`<linearGradient id="gFlag" x1="0" y1="0" x2="1" y2="0"><stop offset="0" style="stop-color:var(--wall-bot)"/><stop offset="1" style="stop-color:var(--wall-top)"/></linearGradient>`
+  +`<filter id="sh" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="1.5" dy="3" stdDeviation="2.2" style="flood-color:var(--shadow)" flood-opacity=".38"/></filter></defs>`;
+ // flagellum behind the cell
+ const fd='M598 246 C650 222 656 270 680 250 S708 222 724 240';
+ s+=`<path d="${fd}" transform="translate(1.5 3)" style="fill:none;stroke:var(--shadow);stroke-width:9;stroke-linecap:round;opacity:.25"/><path d="${fd}" style="fill:none;stroke:url(#gFlag);stroke-width:7;stroke-linecap:round"/><path d="${fd}" transform="translate(0 -1.5)" style="fill:none;stroke:var(--wall-top);stroke-width:1.8;stroke-linecap:round;opacity:.9"/>`;
+ // slab: side wall + cut face
+ s+=`<ellipse cx="362" cy="286" rx="271" ry="190" style="fill:var(--shadow);opacity:.18"/>`;
+ s+=`<ellipse cx="360" cy="280" rx="270" ry="190" fill="url(#gWall)"/>`;
+ s+=`<path d="M90 250 A270 190 0 0 0 630 250" style="fill:none;stroke:var(--wall-top);stroke-width:1.2;opacity:.6" transform="translate(0 16)"/>`;
+ s+=`<ellipse cx="360" cy="250" rx="270" ry="190" fill="url(#gCyto)"/>`;
+ s+=`<ellipse cx="360" cy="250" rx="268" ry="188" style="fill:none;stroke:var(--memb);stroke-width:5"/><ellipse cx="360" cy="250" rx="262" ry="182" style="fill:none;stroke:var(--memb);stroke-width:1.2;opacity:.55"/>`;
+ // microfilaments
+ [[254,175],[248,170],[242,165]].forEach(([rx,ry])=>s+=`<polyline points="${ell(360,250,rx,ry,150,214)}" class="d-fil"/>`);
+ // rough ER
+ [118,104,90].forEach(r=>{const d=arc(300,245,r,105,255);s+=tube(d,'--er-dk','--er','--er-in',8.5);
+   for(let a=107;a<=253;a+=6){const[x,y]=P(300,245,r+6.5,a);s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="url(#gRibo)"/>`}});
+ // nucleus as a sphere with a cut face
+ s+=`<circle cx="300" cy="245" r="79" fill="url(#gNuc)" filter="url(#sh)"/>`;
+ s+=`<circle cx="300" cy="245" r="79" style="fill:none;stroke:var(--nuc-dk);stroke-width:2"/><circle cx="300" cy="245" r="72" style="fill:none;stroke:var(--nuc-dk);stroke-width:1.6;opacity:.8"/>`;
+ s+=`<circle cx="302" cy="248" r="68" style="fill:var(--nuc);opacity:.55"/>`;
+ [[-30,-20],[-40,25],[10,40],[30,-35],[-15,5],[40,20],[-50,-5],[5,-50],[-25,45],[45,-5]].forEach(([dx,dy])=>s+=`<circle cx="${300+dx}" cy="${245+dy}" r="3.2" class="d-chrom"/>`);
+ [20,55,90,125,165,200,235,270,310,345].forEach(a=>{const[x,y]=P(300,245,75.5,a);s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" style="fill:var(--nuc-dk)"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.4" style="fill:var(--nuc-hi)"/>`});
+ s+=`<circle cx="315" cy="230" r="23" fill="url(#gNo)" filter="url(#sh)"/>`;
+ // smooth ER
+ ['M420 99 q12 -10 24 0 t24 0 t24 0','M395 118 q12 -12 24 0 t24 0 t24 0 t24 0','M407 140 q12 -10 24 0 t24 0 t24 0'].forEach(d=>s+=tube(d,'--er-dk','--er','--er-in',7.5));
+ // microtubules
+ [-6,0,6].forEach(o=>{const x1=505+o*.4,y1=138-o,x2=555+o*.4,y2=160-o;s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:var(--ribo);stroke-width:3.6;stroke-linecap:round"/><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:var(--cyto-hi);stroke-width:1.1;stroke-linecap:round"/>`});
+ // mitochondria
+ const mito3=(cx,cy,rx,ry,rot)=>{let z=`M${-rx+9} 0`;let k=0;for(let x=-rx+13;x<rx-8;x+=7){z+=` Q${x-3.5} ${(k%2?1:-1)*(ry-3)} ${x} ${(k++%2?1:-1)*(ry-5)}`}
+   return `<g transform="translate(${cx} ${cy}) rotate(${rot})" filter="url(#sh)"><ellipse rx="${rx}" ry="${ry}" fill="url(#gMito)"/><ellipse rx="${rx-4}" ry="${ry-4}" cy="1" style="fill:var(--mito-in)"/><path d="${z}" style="fill:none;stroke:var(--mito);stroke-width:2;stroke-linejoin:round;stroke-linecap:round"/></g>`};
+ s+=mito3(480,190,33,16,-20)+mito3(215,370,28,14,15);
+ // chloroplast
+ s+=`<g transform="translate(400 385)" filter="url(#sh)"><ellipse rx="45" ry="22" fill="url(#gChl)"/><ellipse rx="40" ry="17" cy="1" style="fill:var(--chl-in)"/><line x1="-34" y1="1" x2="34" y2="1" style="stroke:var(--chl);stroke-width:1.2"/>`;
+ [-24,-8,8,24].forEach(x=>{for(let k=0;k<4;k++){const y=-8+k*3.8;s+=`<rect x="${x-5.5}" y="${y}" width="11" height="3" rx="1.4" style="fill:var(--chl-dk)"/><rect x="${x-5.5}" y="${y}" width="11" height="1.2" rx=".6" style="fill:var(--chl-hi)"/>`}});s+=`</g>`;
+ // golgi
+ [55,46,37,28].forEach(r=>s+=tube(arc(530,280,r,148,212),'--golgi-dk','--golgi','--golgi-hi',6.5));
+ [[467,244,5],[462,318,4.6],[480,229,4],[476,334,4],[452,281,3.4]].forEach(([x,y,r])=>s+=`<circle cx="${x}" cy="${y}" r="${r}" fill="url(#gGv)"/>`);
+ // lysosome
+ s+=`<circle cx="585" cy="235" r="14" fill="url(#gLyso)" filter="url(#sh)"/>`;
+ // free ribosomes
+ [[-12,-8],[-4,-12],[6,-6],[14,-10],[-14,4],[-4,2],[8,6],[16,2],[-8,12],[2,14],[12,14],[-18,-2]].forEach(([x,y])=>s+=`<circle cx="${560+x}" cy="${340+y}" r="2.6" fill="url(#gRibo)"/>`);
+ // leaders + markers
+ S.forEach((o,i)=>{s+=`<line id="ld${i+1}" x1="${o.p[0]}" y1="${o.p[1]}" x2="${o.m[0]}" y2="${o.m[1]}" class="d-lead"/><circle cx="${o.p[0]}" cy="${o.p[1]}" r="2.6" class="d-pt"/>`});
+ S.forEach((o,i)=>{s+=`<g class="mk" id="mk${i+1}" data-n="${i+1}" tabindex="0" role="button" aria-label="Structure ${i+1}"><circle r="22" class="hit" cx="${o.m[0]}" cy="${o.m[1]}"/><circle r="13" class="c" cx="${o.m[0]}" cy="${o.m[1]}"/><text x="${o.m[0]}" y="${o.m[1]}">${i+1}</text></g>`});
+ const svg=document.getElementById('cell');svg.innerHTML=s;
+ svg.querySelectorAll('.mk').forEach(g=>{
+   const n=+g.dataset.n;
+   g.addEventListener('click',()=>onMarker(n));
+   g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onMarker(n)}});
+   g.addEventListener('mouseenter',()=>leadOn(n));g.addEventListener('mouseleave',()=>leadOn(0));
+   g.addEventListener('dragover',e=>{if(st.round===0&&!st.r1.checked)e.preventDefault()});
+   g.addEventListener('drop',e=>{e.preventDefault();const id=e.dataTransfer.getData('text/plain');if(id)place(n,id)});
+ });
+}
+function markers(fn){S.forEach((_,i)=>{document.getElementById('mk'+(i+1)).setAttribute('class','mk '+(fn(i+1)||''))})}
+function leadOn(n){document.querySelectorAll('.d-lead').forEach(l=>l.classList.toggle('lead-on',!!n&&l.id==='ld'+n))}
+
+/* ---------- tabs / totals ---------- */
+const ROUNDS=[['Name it',15],['What does it do?',CLUES.length],['Who has it?',R3.length]];
+const cleanName=v=>v.replace(/\s+/g,' ').trim().slice(0,40),cleanSec=v=>v.replace(/\s+/g,' ').trim().toUpperCase().slice(0,20);
+const mmss=sec=>sec==null?'—':Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+function tabs(){
+ const sc=[st.r1.score,st.r2.score,st.r3.score];
+ document.getElementById('tabs').innerHTML=ROUNDS.map((r,i)=>`<button role="tab" class="${sc[i]!=null?'done':''}" aria-selected="${st.round===i}" data-r="${i}"><span class="num">${sc[i]!=null?'✓':i+1}</span><span class="rt">${r[0]}</span><span class="rs">${sc[i]==null?r[1]+' points':sc[i]+' / '+r[1]}</span></button>`).join('')
+  +`<button role="tab" aria-selected="${st.round===3}" data-r="3"><span class="num">★</span><span class="rt">Leaderboard</span><span class="rs">${LB_ON?'class rankings':'not connected'}</span></button>`;
+ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{st.round=+b.dataset.r;if(st.round===3)loadLB();render()});
+ document.getElementById('totalScore').textContent=sc.reduce((a,b)=>a+(b||0),0);
+ summary();
+}
+const elapsed=()=>st.t0?Math.min(7200,Math.round(((st.tEnd||Date.now())-st.t0)/1000)):null;
+function summary(){
+ const el=document.getElementById('summary');const sc=[st.r1.score,st.r2.score,st.r3.score];
+ if(sc.some(x=>x==null)){el.hidden=true;st.tEnd=null;return}
+ if(!st.tEnd)st.tEnd=Date.now();
+ const t=sc.reduce((a,b)=>a+b,0),pct=t/32;
+ const [rank,v]=pct>=.9?['Organelle Expert','You know this cell inside and out.']:pct>=.75?['Lab Ready','Solid. Check the red items and you’re set.']:pct>=.5?['Getting There','Review the parts you missed, then try again.']:['Back to the Notes','Go over Fig. A with your notes and give it another shot.'];
+ const nm=st.name,sec=st.sec;
+ el.innerHTML=`<div class="big">${t}<span> / 32</span></div><div class="rank">${rank}${nm?' · '+esc(nm):''}</div><div class="verdict">${v}</div><div class="detail">${sec?esc(sec)+' · ':''}Name it ${sc[0]}/15 · Function ${sc[1]}/${CLUES.length} (best streak ${st.r2.best}) · Who has it ${sc[2]}/${R3.length} · ${Math.round(pct*100)}% · time ${mmss(elapsed())}</div>`
+  +(LB_ON?`<div class="sub">${st.submitted?`<button class="btn" id="seeLB">See leaderboard →</button>`:`<button class="btn" id="submitLB">Submit to leaderboard</button>`}<span class="msg" id="subMsg">${esc(st.subMsg)}</span></div>`:'');
+ el.hidden=false;
+ const b=document.getElementById('submitLB');if(b)b.onclick=submitScore;
+ const g=document.getElementById('seeLB');if(g)g.onclick=()=>{st.round=3;loadLB();render();window.scrollTo({top:0,behavior:'smooth'})};
+}
+
+/* ---------- start page ---------- */
+const startPage=document.getElementById('startPage'),app=document.getElementById('app');
+function showApp(){startPage.hidden=true;app.hidden=false;
+ document.getElementById('whoChip').textContent=st.name?(st.name+' · '+st.sec):'Not signed in';
+ document.getElementById('changeWho').textContent=st.name?'Change name':'Enter name';
+ render();window.scrollTo(0,0)}
+function showStart(){app.hidden=true;startPage.hidden=false;window.scrollTo(0,0);document.getElementById('stuName').focus({preventScroll:true})}
+document.getElementById('startForm').addEventListener('submit',e=>{e.preventDefault();
+ const ni=document.getElementById('stuName'),si=document.getElementById('stuSec'),err=document.getElementById('startErr');
+ const nm=cleanName(ni.value),sec=cleanSec(si.value);
+ ni.setAttribute('aria-invalid',!nm);si.setAttribute('aria-invalid',!sec);
+ if(!nm||!sec){err.textContent=!nm&&!sec?'Type your name and section.':!nm?'Type your name.':'Type your section.';(nm?si:ni).focus();return}
+ err.textContent='';
+ if(st.name&&(nm!==st.name||sec!==st.sec)){st.submitted=false;st.subMsg=''}
+ st.name=nm;st.sec=sec;if(!st.t0)st.t0=Date.now();
+ if(st.round===3&&!st.r1.score&&st.r1.score!==0)st.round=0;
+ showApp()});
+document.getElementById('changeWho').onclick=showStart;
+document.getElementById('peekLB').onclick=()=>{st.round=3;loadLB();showApp()};
+
+/* ---------- Round 1 ---------- */
+function place(n,id){
+ const r=st.r1;if(r.checked||st.round!==0)return;
+ for(const k in r.place)if(r.place[k]===id)delete r.place[k];
+ r.place[n]=id;r.sel=null;start();render();
+}
+function onMarker(n){
+ if(st.round===0){const r=st.r1;if(r.checked)return;if(r.sel)place(n,r.sel);else if(r.place[n]){delete r.place[n];render()}}
+ else if(st.round===1)answer2(n);
+}
+function r1(){
+ const r=st.r1,placed=new Set(Object.values(r.place)),cnt=Object.keys(r.place).length;
+ const bank=shuffled.filter(id=>!placed.has(id));
+ let h=`<div><h2>Name it</h2><p class="how">Tap a label to pick it up, then tap a number on the diagram or in the list. On a computer, you can drag it instead. Tap a filled slot to put the label back.</p></div>`;
+ if(!r.checked)h+=`<div class="bank" id="bank">${bank.map(id=>`<button class="chip" draggable="true" data-id="${id}" aria-pressed="${r.sel===id}">${byId[id].name}</button>`).join('')}</div>`;
+ h+=`<ol class="slots">${S.map((o,i)=>{const n=i+1,id=r.place[n];let cls='slot',inner;
+   if(!id)cls+=' empty';if(r.sel&&!r.checked)cls+=' armed';
+   if(r.checked){if(id===o.id){cls+=' ok';inner=byId[id].name}else{cls+=' bad';inner=`<span class="was">${id?byId[id].name:'(blank)'}</span><span class="fix">→ ${o.name}</span>`}}
+   else inner=id?byId[id].name:'';
+   return `<li><span class="n">${n}</span><button class="${cls}" data-n="${n}" ${r.checked?'disabled':''}>${inner}</button></li>`}).join('')}</ol>`;
+ h+=`<div class="actions">${r.checked?`<button class="btn" id="next1">Next round →</button><button class="btn ghost" id="redo1">Try again</button><span class="result"><b>${r.score}</b> / 15 correct</span>`:`<button class="btn" id="check1" ${cnt?'':'disabled'}>Check answers</button><button class="btn ghost" id="clear1">Clear</button><span class="result">${cnt} / 15 placed</span>`}</div>`;
+ panel.innerHTML=h;
+ panel.querySelectorAll('.chip').forEach(c=>{
+   c.onclick=()=>{r.sel=r.sel===c.dataset.id?null:c.dataset.id;render()};
+   c.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',c.dataset.id);e.dataTransfer.effectAllowed='move'});
+ });
+ panel.querySelectorAll('.slot').forEach(b=>{const n=+b.dataset.n;
+   b.onclick=()=>onMarker(n);
+   b.onmouseenter=()=>leadOn(n);b.onmouseleave=()=>leadOn(0);
+   b.addEventListener('dragover',e=>{e.preventDefault();b.classList.add('over')});
+   b.addEventListener('dragleave',()=>b.classList.remove('over'));
+   b.addEventListener('drop',e=>{e.preventDefault();const id=e.dataTransfer.getData('text/plain');if(id)place(n,id)});
+ });
+ const q=id=>document.getElementById(id);
+ if(q('check1'))q('check1').onclick=()=>{r.checked=true;r.score=S.filter((o,i)=>r.place[i+1]===o.id).length;r.sel=null;render()};
+ if(q('clear1'))q('clear1').onclick=()=>{r.place={};r.sel=null;render()};
+ if(q('redo1'))q('redo1').onclick=()=>{st.submitted=false;st.subMsg='';r.checked=false;r.score=null;r.place={};render()};
+ if(q('next1'))q('next1').onclick=()=>{st.round=1;render()};
+ markers(n=>{const id=r.place[n];if(r.checked)return id===S[n-1].id?'ok':'bad';return (id?'filled ':'')+(r.sel?'armed':'')});
+}
+
+/* ---------- Round 2 ---------- */
+const YES=['Nice!','Correct!','Got it!','Yes!','Spot on!'],NO=['Not quite','Close, but no','Nope'];
+function answer2(n){
+ const r=st.r2;if(r.i>=CLUES.length||r.pick!=null)return;
+ start();r.pick=n;const ok=S[n-1].id===CLUES[r.i].a;r.res[r.i]=ok;
+ r.streak=ok?r.streak+1:0;r.best=Math.max(r.best,r.streak);render();
+}
+function r2(){
+ const r=st.r2;const done=r.i>=CLUES.length;
+ let h=`<div><h2>What does it do?</h2><p class="how">Read the clue, then tap the matching part on the diagram or its number below. Your first tap is your answer.</p></div>`;
+ h+=`<div class="r2top"><div class="dots">${CLUES.map((_,k)=>`<i class="${r.res[k]===true?'ok':r.res[k]===false?'bad':k===r.i?'cur':''}"></i>`).join('')}</div><span class="streak">Streak ${r.streak} · Best ${r.best}</span></div>`;
+ if(done){
+   h+=`<div class="fb ${r.score>=7?'ok':''}"><b>${r.score} of ${CLUES.length}</b> right on the first try.</div><div class="actions"><button class="btn" id="next2">Next round →</button><button class="btn ghost" id="redo2">Try again</button></div>`;
+   panel.innerHTML=h;markers(()=>'');
+ }else{
+   const c=CLUES[r.i],ans=byId[c.a].n;
+   h+=`<div class="clue"><span class="k">Clue ${r.i+1} of ${CLUES.length} · Who am I?</span><p>${c.t}</p></div>`;
+   h+=`<div class="pad">${S.map((_,k)=>{const n=k+1;let cls='';if(r.pick!=null){if(n===ans)cls='ok';else if(n===r.pick)cls='bad'}return `<button data-n="${n}" class="${cls}" ${r.pick!=null?'disabled':''} aria-label="Structure ${n}">${n}</button>`}).join('')}</div>`;
+   if(r.pick!=null){const ok=r.pick===ans,pool=ok?YES:NO;
+     h+=`<div class="fb ${ok?'ok':'bad'}"><span class="tag">${pool[r.i%pool.length]}</span><b>${byId[c.a].name} (#${ans}).</b> ${c.w}</div><div class="actions"><button class="btn" id="go2">${r.i+1<CLUES.length?'Next clue →':'See my result'}</button></div>`}
+   panel.innerHTML=h;
+   panel.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>answer2(+b.dataset.n));
+   markers(n=>r.pick==null?'':n===ans?'reveal':n===r.pick?'bad':'');
+   const g=document.getElementById('go2');if(g){g.onclick=()=>{r.i++;r.pick=null;if(r.i>=CLUES.length)r.score=r.res.filter(Boolean).length;render()};g.focus({preventScroll:true})}
+ }
+ const q=id=>document.getElementById(id);
+ if(q('redo2'))q('redo2').onclick=()=>{st.submitted=false;st.subMsg='';st.r2={i:0,res:[],pick:null,score:null,streak:0,best:0};render()};
+ if(q('next2'))q('next2').onclick=()=>{st.round=2;render()};
+}
+
+/* ---------- Round 3 ---------- */
+function r3(){
+ const r=st.r3;
+ let h=`<div><h2>Who has it?</h2><p class="how">Not every microbe has every part from Fig. A. Tick each group that <em>usually</em> has the structure. A row only counts if all three boxes are right.</p></div>`;
+ h+=`<div class="tablewrap"><table class="sort"><thead><tr><th>Structure</th>${G.map(g=>`<th class="c g${g[0]}">${g[1]}</th>`).join('')}</tr></thead><tbody>`;
+ R3.forEach(row=>{const p=r.pick[row.id];let rc='';
+   if(r.checked)rc=G.every(([k])=>p.has(k)===row.a.includes(k))?'ok':'bad';
+   h+=`<tr class="${rc}"><td>${row.name}${r.checked?`<span class="why">${row.w}</span>`:''}</td>${G.map(([k,name])=>{let cls='tog';
+     if(r.checked){const want=row.a.includes(k),has=p.has(k);if(want&&!has)cls+=' miss';if(!want&&has)cls+=' extra'}
+     return `<td class="c"><button class="${cls}" data-row="${row.id}" data-g="${k}" aria-pressed="${p.has(k)}" aria-label="${row.name}: ${name}" ${r.checked?'disabled':''}>${p.has(k)?'✓':''}</button></td>`}).join('')}</tr>`});
+ h+=`</tbody></table></div>`;
+ h+=`<div class="actions">${r.checked?`<button class="btn ghost" id="redo3">Try again</button><span class="result"><b>${r.score}</b> / ${R3.length} rows correct</span>`:`<button class="btn" id="check3">Check answers</button>`}</div>`;
+ if(r.checked)h+=`<div class="legend">Red dashed box = you missed it. Solid red = it shouldn’t be ticked.</div>`;
+ panel.innerHTML=h;
+ panel.querySelectorAll('.tog').forEach(b=>b.onclick=()=>{const s=r.pick[b.dataset.row];start();s.has(b.dataset.g)?s.delete(b.dataset.g):s.add(b.dataset.g);render()});
+ const q=id=>document.getElementById(id);
+ if(q('check3'))q('check3').onclick=()=>{r.checked=true;r.score=R3.filter(row=>G.every(([k])=>r.pick[row.id].has(k)===row.a.includes(k))).length;render()};
+ if(q('redo3'))q('redo3').onclick=()=>{st.submitted=false;st.subMsg='';r.checked=false;r.score=null;R3.forEach(x=>r.pick[x.id]=new Set());render()};
+}
+
+/* ---------- Leaderboard ---------- */
+async function submitScore(){
+ const nm=st.name,sec=st.sec;
+ const msg=t=>{st.subMsg=t;const m=document.getElementById('subMsg');if(m)m.textContent=t};
+ if(!nm||!sec){msg('Enter your name first.');showStart();return}
+ const b=document.getElementById('submitLB');if(b)b.disabled=true;msg('Submitting…');
+ try{await sb(CONFIG.TABLE,{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({name:nm,section:sec,r1:st.r1.score,r2:st.r2.score,r3:st.r3.score,seconds:elapsed()})});
+   st.submitted=true;st.lb.sec=sec;msg('Submitted!');summary();loadLB();
+ }catch(e){if(b)b.disabled=false;msg('Couldn’t submit. Check your internet and try again.')}
+}
+async function loadLB(){
+ if(!LB_ON||st.lb.loading)return;st.lb.loading=true;if(st.round===3)render();
+ try{st.lb.rows=await sb(CONFIG.TABLE+'?select=name,section,total,seconds,created_at&order=total.desc,seconds.asc.nullslast,created_at.asc&limit=1000');st.lb.err=''}
+ catch(e){st.lb.err='Couldn’t load the leaderboard. Check your connection and refresh.'}
+ st.lb.loading=false;if(st.round===3)render();
+}
+setInterval(()=>{if(st.round===3&&!document.hidden)loadLB()},20000);
+function lb(){
+ const L=st.lb;let h=`<div><h2>Leaderboard</h2><p class="how">Each student’s best attempt. Ties go to the faster time.</p></div>`;
+ if(!LB_ON){panel.innerHTML=h+`<div class="note">The leaderboard isn’t connected yet. Your teacher needs to add the Supabase settings to this page.</div>`;markers(()=>'');return}
+ const rows=L.rows||[];const secs=[...new Set(rows.map(r=>r.section))].sort();
+ const seen=new Set(),best=[];rows.forEach(r=>{const k=r.name.toLowerCase()+'|'+r.section;if(!seen.has(k)){seen.add(k);best.push(r)}});
+ const shown=best.filter(r=>L.sec==='all'||r.section===L.sec).slice(0,50);
+ const me=st.name.toLowerCase()+'|'+st.sec;
+ h+=`<div class="lbbar"><label>Section <select id="lbSec"><option value="all">All sections</option>${secs.map(x=>`<option value="${esc(x)}" ${L.sec===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><button class="btn ghost" id="lbRefresh">${L.loading?'Loading…':'Refresh'}</button></div>`;
+ if(L.err)h+=`<div class="note bad">${L.err}</div>`;
+ if(L.rows&&!shown.length)h+=`<div class="note">No scores yet${L.sec!=='all'?' for '+esc(L.sec):''}. Finish all three rounds and hit “Submit to leaderboard” to be first.</div>`;
+ else if(!L.rows&&!L.err)h+=`<div class="note">Loading scores…</div>`;
+ else h+=`<div class="lbwrap"><table class="lb"><thead><tr><th>#</th><th>Name</th><th>Section</th><th class="num">Score</th><th class="num">Time</th></tr></thead><tbody>${shown.map((r,i)=>`<tr class="${(r.name.toLowerCase()+'|'+r.section)===me?'me':''}"><td><span class="rk ${i<3?'r'+(i+1):''}">${i+1}</span></td><td class="nm">${esc(r.name)}</td><td>${esc(r.section)}</td><td class="num"><b>${r.total}</b> / 32</td><td class="num">${mmss(r.seconds)}</td></tr>`).join('')}</tbody></table></div>`;
+ panel.innerHTML=h;markers(()=>'');
+ const sel=document.getElementById('lbSec');if(sel)sel.onchange=()=>{L.sec=sel.value;render()};
+ const rf=document.getElementById('lbRefresh');if(rf)rf.onclick=loadLB;
+}
+
+const panel=document.getElementById('panel');
+function render(){
+ document.getElementById('stage').classList.toggle('wide',st.round>=2);
+ leadOn(0);[r1,r2,r3,lb][st.round]();tabs();
+}
+drawCell();
+})();
+</script>
+
+</body>
+</html>
