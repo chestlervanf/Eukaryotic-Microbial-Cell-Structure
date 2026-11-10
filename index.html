@@ -216,6 +216,27 @@ table.sort tr.bad td{background:var(--bad-soft)}
 .mk.reveal .c{animation:pop .5s ease}
 @keyframes pop{0%{r:12}40%{r:17}100%{r:13}}
 .lead-on{stroke:var(--sel);stroke-width:2.4}
+/* phone fixes */
+@media (max-width:640px){
+  .mk .c,.mk text{transform-box:fill-box;transform-origin:center;transform:scale(1.55)}
+  .mk text{font-size:12px}
+  table.sort{min-width:0}
+  table.sort th,table.sort td{padding:9px 6px}
+  table.sort th:first-child,table.sort td:first-child{padding-left:12px}
+  table.sort thead th{font-size:13px}
+  table.sort thead th.c{width:52px}
+  table.sort td{font-size:14.5px}
+  table.sort .why{font-size:13px}
+  .tog{width:40px;height:40px}
+  .panel{padding:16px 14px}
+}
+@media (max-width:480px){
+  nav.rounds{grid-template-columns:repeat(2,minmax(0,1fr))}
+  nav.rounds button{grid-template-columns:auto minmax(0,1fr);text-align:left;justify-items:start;padding:10px 12px}
+  nav.rounds .num{grid-row:span 2;width:32px;height:32px;font-size:15px}
+  nav.rounds .rt{font-size:14px}
+  .pad{gap:6px}
+}
 /* test mode */
 .dots i.ans{background:var(--accent)}
 .pad button.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
