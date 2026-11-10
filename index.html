@@ -289,14 +289,14 @@ table.lb tr.me td{background:var(--sel-soft)}
 (function(){
 /* ======= SET THESE TWO VALUES (Supabase → Project Settings → API) ======= */
 const CONFIG={
-  SUPABASE_URL:'https://rnbacmatfibpwiutgpup.supabase.co/rest/v1/',        // e.g. https://abcdxyz.supabase.co
+  SUPABASE_URL:'https://rnbacmatfibpwiutgpup.supabase.co',        // e.g. https://abcdxyz.supabase.co
   SUPABASE_ANON_KEY:'sb_publishable_ErG2BdS33jeCm_kN_AHk9w_Z1Zk2_4f',   // the "anon public" key (safe to put in a web page)
   TABLE:'cell_scores'
 };
 /* ======================================================================= */
 const LB_ON=!!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_ANON_KEY);
 async function sb(path,opts){opts=opts||{};const k=CONFIG.SUPABASE_ANON_KEY;
- const r=await fetch(CONFIG.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/'+path,{method:opts.method||'GET',body:opts.body,
+ const r=await fetch(CONFIG.SUPABASE_URL.trim().replace(/\/+$/,'').replace(/\/rest\/v1$/,'')+'/rest/v1/'+path,{method:opts.method||'GET',body:opts.body,
    headers:Object.assign({apikey:k,'Content-Type':'application/json'},/^eyJ/.test(k)?{Authorization:'Bearer '+k}:{},opts.headers||{})});
  if(!r.ok){let t='';try{t=await r.text()}catch(e){}throw new Error(t||('HTTP '+r.status))}
  return r.status===204||r.headers.get('content-length')==='0'?null:r.json().catch(()=>null)}
@@ -567,12 +567,12 @@ async function submitScore(){
  const b=document.getElementById('submitLB');if(b)b.disabled=true;msg('Submitting…');
  try{await sb(CONFIG.TABLE,{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({name:nm,section:sec,r1:st.r1.score,r2:st.r2.score,r3:st.r3.score,seconds:elapsed()})});
    st.submitted=true;st.lb.sec=sec;msg('Submitted!');summary();loadLB();
- }catch(e){if(b)b.disabled=false;msg('Couldn’t submit. Check your internet and try again.')}
+ }catch(e){if(b)b.disabled=false;msg('Couldn’t submit. Details: '+String(e&&e.message||e).slice(0,160))}
 }
 async function loadLB(){
  if(!LB_ON||st.lb.loading)return;st.lb.loading=true;if(st.round===3)render();
  try{st.lb.rows=await sb(CONFIG.TABLE+'?select=name,section,total,seconds,created_at&order=total.desc,seconds.asc.nullslast,created_at.asc&limit=1000');st.lb.err=''}
- catch(e){st.lb.err='Couldn’t load the leaderboard. Check your connection and refresh.'}
+ catch(e){st.lb.err='Couldn’t load the leaderboard. Details: '+String(e&&e.message||e).slice(0,220)}
  st.lb.loading=false;if(st.round===3)render();
 }
 setInterval(()=>{if(st.round===3&&!document.hidden)loadLB()},20000);
@@ -584,7 +584,7 @@ function lb(){
  const shown=best.filter(r=>L.sec==='all'||r.section===L.sec).slice(0,50);
  const me=st.name.toLowerCase()+'|'+st.sec;
  h+=`<div class="lbbar"><label>Section <select id="lbSec"><option value="all">All sections</option>${secs.map(x=>`<option value="${esc(x)}" ${L.sec===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><button class="btn ghost" id="lbRefresh">${L.loading?'Loading…':'Refresh'}</button></div>`;
- if(L.err)h+=`<div class="note bad">${L.err}</div>`;
+ if(L.err)h+=`<div class="note bad">${esc(L.err)}</div>`;
  if(L.rows&&!shown.length)h+=`<div class="note">No scores yet${L.sec!=='all'?' for '+esc(L.sec):''}. Finish all three rounds and hit “Submit to leaderboard” to be first.</div>`;
  else if(!L.rows&&!L.err)h+=`<div class="note">Loading scores…</div>`;
  else h+=`<div class="lbwrap"><table class="lb"><thead><tr><th>#</th><th>Name</th><th>Section</th><th class="num">Score</th><th class="num">Time</th></tr></thead><tbody>${shown.map((r,i)=>`<tr class="${(r.name.toLowerCase()+'|'+r.section)===me?'me':''}"><td><span class="rk ${i<3?'r'+(i+1):''}">${i+1}</span></td><td class="nm">${esc(r.name)}</td><td>${esc(r.section)}</td><td class="num"><b>${r.total}</b> / 32</td><td class="num">${mmss(r.seconds)}</td></tr>`).join('')}</tbody></table></div>`;
