@@ -216,6 +216,15 @@ table.sort tr.bad td{background:var(--bad-soft)}
 .mk.reveal .c{animation:pop .5s ease}
 @keyframes pop{0%{r:12}40%{r:17}100%{r:13}}
 .lead-on{stroke:var(--sel);stroke-width:2.4}
+/* test mode */
+.dots i.ans{background:var(--accent)}
+.pad button.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.review{display:flex;flex-direction:column;gap:8px}
+.rv{display:block;margin-top:6px;font-weight:700}
+.rv.muted{font-weight:400;color:var(--muted);margin-top:4px}
+.confirm{border:2px solid var(--sel);background:var(--sel-soft);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.confirm b{font:800 19px var(--display)}
+.confirm p{margin:0}
 /* leaderboard */
 .lbbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .lbbar select{font:inherit;border:2px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:10px;padding:8px 12px;min-height:44px}
@@ -246,7 +255,7 @@ table.lb tr.me td{background:var(--sel-soft)}
     <div>
       <div class="eyebrow">Microbiology 10 · Check Your Understanding</div>
       <h1>Inside a Eukaryotic Microbe</h1>
-      <p class="lede">Three quick rounds. Name the parts, figure out what they do, then decide which microbes actually have them. The timer starts when you hit Start.</p>
+      <p class="lede">Three quick rounds. Name the parts, figure out what they do, then decide which microbes actually have them. The timer starts when you hit Start. Your score and the answers appear only after you finish all three rounds.</p>
     </div>
     <ol class="steps">
       <li><span class="sn">1</span><b>Name it</b><span class="pts">15 pts</span></li>
@@ -343,9 +352,9 @@ const R3=[
 ];
 const G=[['A','Algae'],['F','Fungi'],['P','Protozoa']];
 
-const st={name:'',sec:'',round:0,t0:null,submitted:false,subMsg:'',lb:{rows:null,err:'',loading:false,sec:'all'},
+const st={name:'',sec:'',done:false,confirm:false,subFail:false,round:0,t0:null,submitted:false,subMsg:'',lb:{rows:null,err:'',loading:false,sec:'all'},
  r1:{place:{},sel:null,checked:false,score:null},
- r2:{i:0,res:[],pick:null,score:null,streak:0,best:0},
+ r2:{i:0,ans:[],score:null},
  r3:{pick:{},checked:false,score:null}};
 R3.forEach(r=>st.r3.pick[r.id]=new Set());
 const shuffled=S.map(s=>s.id).sort(()=>Math.random()-.5);
@@ -414,7 +423,7 @@ function drawCell(){
    g.addEventListener('click',()=>onMarker(n));
    g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onMarker(n)}});
    g.addEventListener('mouseenter',()=>leadOn(n));g.addEventListener('mouseleave',()=>leadOn(0));
-   g.addEventListener('dragover',e=>{if(st.round===0&&!st.r1.checked)e.preventDefault()});
+   g.addEventListener('dragover',e=>{if(st.round===0&&!st.done)e.preventDefault()});
    g.addEventListener('drop',e=>{e.preventDefault();const id=e.dataTransfer.getData('text/plain');if(id)place(n,id)});
  });
 }
@@ -425,34 +434,47 @@ function leadOn(n){document.querySelectorAll('.d-lead').forEach(l=>l.classList.t
 const ROUNDS=[['Name it',15],['What does it do?',CLUES.length],['Who has it?',R3.length]];
 const cleanName=v=>v.replace(/\s+/g,' ').trim().slice(0,40),cleanSec=v=>v.replace(/\s+/g,' ').trim().toUpperCase().slice(0,20);
 const mmss=sec=>sec==null?'—':Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+const MAX=[15,CLUES.length,R3.length];
+const answered=()=>[Object.keys(st.r1.place).length,st.r2.ans.filter(x=>x!=null).length,R3.filter(x=>st.r3.pick[x.id].size).length];
 function tabs(){
- const sc=[st.r1.score,st.r2.score,st.r3.score];
- document.getElementById('tabs').innerHTML=ROUNDS.map((r,i)=>`<button role="tab" class="${sc[i]!=null?'done':''}" aria-selected="${st.round===i}" data-r="${i}"><span class="num">${sc[i]!=null?'✓':i+1}</span><span class="rt">${r[0]}</span><span class="rs">${sc[i]==null?r[1]+' points':sc[i]+' / '+r[1]}</span></button>`).join('')
+ const sc=[st.r1.score,st.r2.score,st.r3.score],an=answered();
+ document.getElementById('tabs').innerHTML=ROUNDS.map((r,i)=>`<button role="tab" class="${st.done?'done':''}" aria-selected="${st.round===i}" data-r="${i}"><span class="num">${st.done?'✓':i+1}</span><span class="rt">${r[0]}</span><span class="rs">${st.done?sc[i]+' / '+MAX[i]:an[i]+' / '+MAX[i]+' answered'}</span></button>`).join('')
   +`<button role="tab" aria-selected="${st.round===3}" data-r="3"><span class="num">★</span><span class="rt">Leaderboard</span><span class="rs">${LB_ON?'class rankings':'not connected'}</span></button>`;
- document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{st.round=+b.dataset.r;if(st.round===3)loadLB();render()});
- document.getElementById('totalScore').textContent=sc.reduce((a,b)=>a+(b||0),0);
+ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{st.round=+b.dataset.r;st.confirm=false;if(st.round===3)loadLB();render()});
+ document.getElementById('totalScore').textContent=st.done?sc.reduce((a,b)=>a+b,0):'—';
+ document.querySelector('.total span').textContent=st.done?'out of 32':'shown at the end';
  summary();
 }
 const elapsed=()=>st.t0?Math.min(7200,Math.round(((st.tEnd||Date.now())-st.t0)/1000)):null;
 function summary(){
- const el=document.getElementById('summary');const sc=[st.r1.score,st.r2.score,st.r3.score];
- if(sc.some(x=>x==null)){el.hidden=true;st.tEnd=null;return}
- if(!st.tEnd)st.tEnd=Date.now();
- const t=sc.reduce((a,b)=>a+b,0),pct=t/32;
- const [rank,v]=pct>=.9?['Organelle Expert','You know this cell inside and out.']:pct>=.75?['Lab Ready','Solid. Check the red items and you’re set.']:pct>=.5?['Getting There','Review the parts you missed, then try again.']:['Back to the Notes','Go over Fig. A with your notes and give it another shot.'];
- const nm=st.name,sec=st.sec;
- el.innerHTML=`<div class="big">${t}<span> / 32</span></div><div class="rank">${rank}${nm?' · '+esc(nm):''}</div><div class="verdict">${v}</div><div class="detail">${sec?esc(sec)+' · ':''}Name it ${sc[0]}/15 · Function ${sc[1]}/${CLUES.length} (best streak ${st.r2.best}) · Who has it ${sc[2]}/${R3.length} · ${Math.round(pct*100)}% · time ${mmss(elapsed())}</div>`
-  +(LB_ON?`<div class="sub">${st.submitted?`<button class="btn" id="seeLB">See leaderboard →</button>`:`<button class="btn" id="submitLB">Submit to leaderboard</button>`}<span class="msg" id="subMsg">${esc(st.subMsg)}</span></div>`:'');
+ const el=document.getElementById('summary');
+ if(!st.done||st.round===3){el.hidden=true;return}
+ const sc=[st.r1.score,st.r2.score,st.r3.score],t=sc.reduce((a,b)=>a+b,0),pct=t/32;
+ const [rank,v]=pct>=.9?['Organelle Expert','You know this cell inside and out.']:pct>=.75?['Lab Ready','Solid work. Look over the items marked in red.']:pct>=.5?['Getting There','Review the parts you missed in each round.']:['Back to the Notes','Go over Fig. A with your notes and the review in each round.'];
+ let sub='';
+ if(LB_ON){sub=`<div class="sub">${st.submitted?`<button class="btn" id="seeLB">See leaderboard →</button>`:st.subFail?`<button class="btn" id="submitLB">Try submitting again</button>`:''}<span class="msg" id="subMsg">${esc(st.subMsg)}</span></div>`}
+ el.innerHTML=`<div class="big">${t}<span> / 32</span></div><div class="rank">${rank} · ${esc(st.name)}</div><div class="verdict">${v} Open each round above to see the answers.</div><div class="detail">${esc(st.sec)} · Name it ${sc[0]}/15 · Function ${sc[1]}/${CLUES.length} · Who has it ${sc[2]}/${R3.length} · ${Math.round(pct*100)}% · time ${mmss(elapsed())}</div>`+sub;
  el.hidden=false;
  const b=document.getElementById('submitLB');if(b)b.onclick=submitScore;
  const g=document.getElementById('seeLB');if(g)g.onclick=()=>{st.round=3;loadLB();render();window.scrollTo({top:0,behavior:'smooth'})};
+}
+function finish(){
+ const r1=st.r1,r2=st.r2,r3=st.r3;
+ r1.score=S.filter((o,i)=>r1.place[i+1]===o.id).length;r1.sel=null;
+ r2.score=CLUES.filter((c,i)=>r2.ans[i]!=null&&S[r2.ans[i]-1].id===c.a).length;
+ r3.score=R3.filter(row=>G.every(([k])=>r3.pick[row.id].has(k)===row.a.includes(k))).length;
+ st.done=true;st.confirm=false;st.tEnd=Date.now();
+ document.getElementById('changeWho').hidden=true;
+ render();
+ const el=document.getElementById('summary');if(el&&!el.hidden)el.scrollIntoView({behavior:'smooth',block:'center'});
+ if(LB_ON)submitScore();
 }
 
 /* ---------- start page ---------- */
 const startPage=document.getElementById('startPage'),app=document.getElementById('app');
 function showApp(){startPage.hidden=true;app.hidden=false;
  document.getElementById('whoChip').textContent=st.name?(st.name+' · '+st.sec):'Not signed in';
- document.getElementById('changeWho').textContent=st.name?'Change name':'Enter name';
+ const cw=document.getElementById('changeWho');cw.textContent=st.name?'Change name':'Enter name';cw.hidden=st.done;
  render();window.scrollTo(0,0)}
 function showStart(){app.hidden=true;startPage.hidden=false;window.scrollTo(0,0);document.getElementById('stuName').focus({preventScroll:true})}
 document.getElementById('startForm').addEventListener('submit',e=>{e.preventDefault();
@@ -461,34 +483,33 @@ document.getElementById('startForm').addEventListener('submit',e=>{e.preventDefa
  ni.setAttribute('aria-invalid',!nm);si.setAttribute('aria-invalid',!sec);
  if(!nm||!sec){err.textContent=!nm&&!sec?'Type your name and section.':!nm?'Type your name.':'Type your section.';(nm?si:ni).focus();return}
  err.textContent='';
- if(st.name&&(nm!==st.name||sec!==st.sec)){st.submitted=false;st.subMsg=''}
  st.name=nm;st.sec=sec;if(!st.t0)st.t0=Date.now();
- if(st.round===3&&!st.r1.score&&st.r1.score!==0)st.round=0;
+ if(st.round===3&&!st.done)st.round=0;
  showApp()});
 document.getElementById('changeWho').onclick=showStart;
 document.getElementById('peekLB').onclick=()=>{st.round=3;loadLB();showApp()};
 
 /* ---------- Round 1 ---------- */
 function place(n,id){
- const r=st.r1;if(r.checked||st.round!==0)return;
+ const r=st.r1;if(st.done||st.round!==0)return;
  for(const k in r.place)if(r.place[k]===id)delete r.place[k];
  r.place[n]=id;r.sel=null;start();render();
 }
 function onMarker(n){
- if(st.round===0){const r=st.r1;if(r.checked)return;if(r.sel)place(n,r.sel);else if(r.place[n]){delete r.place[n];render()}}
+ if(st.round===0){const r=st.r1;if(st.done)return;if(r.sel)place(n,r.sel);else if(r.place[n]){delete r.place[n];render()}}
  else if(st.round===1)answer2(n);
 }
 function r1(){
- const r=st.r1,placed=new Set(Object.values(r.place)),cnt=Object.keys(r.place).length;
+ const r=st.r1,done=st.done,placed=new Set(Object.values(r.place)),cnt=Object.keys(r.place).length;
  const bank=shuffled.filter(id=>!placed.has(id));
- let h=`<div><h2>Name it</h2><p class="how">Tap a label to pick it up, then tap a number on the diagram or in the list. On a computer, you can drag it instead. Tap a filled slot to put the label back.</p></div>`;
- if(!r.checked)h+=`<div class="bank" id="bank">${bank.map(id=>`<button class="chip" draggable="true" data-id="${id}" aria-pressed="${r.sel===id}">${byId[id].name}</button>`).join('')}</div>`;
+ let h=`<div><h2>Name it</h2><p class="how">${done?'Your answers, checked. Red slots show the correct name.':'Tap a label to pick it up, then tap a number on the diagram or in the list. On a computer, you can drag it instead. Tap a filled slot to put the label back. You can change answers until you finish the test.'}</p></div>`;
+ if(!done)h+=`<div class="bank" id="bank">${bank.map(id=>`<button class="chip" draggable="true" data-id="${id}" aria-pressed="${r.sel===id}">${byId[id].name}</button>`).join('')}</div>`;
  h+=`<ol class="slots">${S.map((o,i)=>{const n=i+1,id=r.place[n];let cls='slot',inner;
-   if(!id)cls+=' empty';if(r.sel&&!r.checked)cls+=' armed';
-   if(r.checked){if(id===o.id){cls+=' ok';inner=byId[id].name}else{cls+=' bad';inner=`<span class="was">${id?byId[id].name:'(blank)'}</span><span class="fix">→ ${o.name}</span>`}}
+   if(!id)cls+=' empty';if(r.sel&&!done)cls+=' armed';
+   if(done){if(id===o.id){cls+=' ok';inner=byId[id].name}else{cls+=' bad';inner=`<span class="was">${id?byId[id].name:'(blank)'}</span><span class="fix">→ ${o.name}</span>`}}
    else inner=id?byId[id].name:'';
-   return `<li><span class="n">${n}</span><button class="${cls}" data-n="${n}" ${r.checked?'disabled':''}>${inner}</button></li>`}).join('')}</ol>`;
- h+=`<div class="actions">${r.checked?`<button class="btn" id="next1">Next round →</button><button class="btn ghost" id="redo1">Try again</button><span class="result"><b>${r.score}</b> / 15 correct</span>`:`<button class="btn" id="check1" ${cnt?'':'disabled'}>Check answers</button><button class="btn ghost" id="clear1">Clear</button><span class="result">${cnt} / 15 placed</span>`}</div>`;
+   return `<li><span class="n">${n}</span><button class="${cls}" data-n="${n}" ${done?'disabled':''}>${inner}</button></li>`}).join('')}</ol>`;
+ h+=`<div class="actions">${done?`<span class="result"><b>${r.score}</b> / 15 correct</span>`:`<button class="btn" id="next1">Next round →</button><button class="btn ghost" id="clear1" ${cnt?'':'disabled'}>Clear all</button><span class="result">${cnt} / 15 placed</span>`}</div>`;
  panel.innerHTML=h;
  panel.querySelectorAll('.chip').forEach(c=>{
    c.onclick=()=>{r.sel=r.sel===c.dataset.id?null:c.dataset.id;render()};
@@ -502,72 +523,76 @@ function r1(){
    b.addEventListener('drop',e=>{e.preventDefault();const id=e.dataTransfer.getData('text/plain');if(id)place(n,id)});
  });
  const q=id=>document.getElementById(id);
- if(q('check1'))q('check1').onclick=()=>{r.checked=true;r.score=S.filter((o,i)=>r.place[i+1]===o.id).length;r.sel=null;render()};
  if(q('clear1'))q('clear1').onclick=()=>{r.place={};r.sel=null;render()};
- if(q('redo1'))q('redo1').onclick=()=>{st.submitted=false;st.subMsg='';r.checked=false;r.score=null;r.place={};render()};
- if(q('next1'))q('next1').onclick=()=>{st.round=1;render()};
- markers(n=>{const id=r.place[n];if(r.checked)return id===S[n-1].id?'ok':'bad';return (id?'filled ':'')+(r.sel?'armed':'')});
+ if(q('next1'))q('next1').onclick=()=>{st.round=1;render();window.scrollTo({top:0,behavior:'smooth'})};
+ markers(n=>{const id=r.place[n];if(done)return id===S[n-1].id?'ok':'bad';return (id?'filled ':'')+(r.sel?'armed':'')});
 }
 
 /* ---------- Round 2 ---------- */
-const YES=['Nice!','Correct!','Got it!','Yes!','Spot on!'],NO=['Not quite','Close, but no','Nope'];
 function answer2(n){
- const r=st.r2;if(r.i>=CLUES.length||r.pick!=null)return;
- start();r.pick=n;const ok=S[n-1].id===CLUES[r.i].a;r.res[r.i]=ok;
- r.streak=ok?r.streak+1:0;r.best=Math.max(r.best,r.streak);render();
+ const r=st.r2;if(st.done||r.i>=CLUES.length)return;
+ start();r.ans[r.i]=n;render();
 }
 function r2(){
- const r=st.r2;const done=r.i>=CLUES.length;
- let h=`<div><h2>What does it do?</h2><p class="how">Read the clue, then tap the matching part on the diagram or its number below. Your first tap is your answer.</p></div>`;
- h+=`<div class="r2top"><div class="dots">${CLUES.map((_,k)=>`<i class="${r.res[k]===true?'ok':r.res[k]===false?'bad':k===r.i?'cur':''}"></i>`).join('')}</div><span class="streak">Streak ${r.streak} · Best ${r.best}</span></div>`;
- if(done){
-   h+=`<div class="fb ${r.score>=7?'ok':''}"><b>${r.score} of ${CLUES.length}</b> right on the first try.</div><div class="actions"><button class="btn" id="next2">Next round →</button><button class="btn ghost" id="redo2">Try again</button></div>`;
-   panel.innerHTML=h;markers(()=>'');
- }else{
-   const c=CLUES[r.i],ans=byId[c.a].n;
-   h+=`<div class="clue"><span class="k">Clue ${r.i+1} of ${CLUES.length} · Who am I?</span><p>${c.t}</p></div>`;
-   h+=`<div class="pad">${S.map((_,k)=>{const n=k+1;let cls='';if(r.pick!=null){if(n===ans)cls='ok';else if(n===r.pick)cls='bad'}return `<button data-n="${n}" class="${cls}" ${r.pick!=null?'disabled':''} aria-label="Structure ${n}">${n}</button>`}).join('')}</div>`;
-   if(r.pick!=null){const ok=r.pick===ans,pool=ok?YES:NO;
-     h+=`<div class="fb ${ok?'ok':'bad'}"><span class="tag">${pool[r.i%pool.length]}</span><b>${byId[c.a].name} (#${ans}).</b> ${c.w}</div><div class="actions"><button class="btn" id="go2">${r.i+1<CLUES.length?'Next clue →':'See my result'}</button></div>`}
-   panel.innerHTML=h;
-   panel.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>answer2(+b.dataset.n));
-   markers(n=>r.pick==null?'':n===ans?'reveal':n===r.pick?'bad':'');
-   const g=document.getElementById('go2');if(g){g.onclick=()=>{r.i++;r.pick=null;if(r.i>=CLUES.length)r.score=r.res.filter(Boolean).length;render()};g.focus({preventScroll:true})}
+ const r=st.r2;
+ if(st.done){
+   let h=`<div><h2>What does it do?</h2><p class="how">Each clue with your answer and the correct structure.</p></div><div class="review">`;
+   CLUES.forEach((c,k)=>{const a=r.ans[k],ans=byId[c.a].n,ok=a===ans;
+     h+=`<div class="fb ${ok?'ok':'bad'}"><span class="tag">${ok?'Correct':'Wrong'}</span><b>Clue ${k+1}.</b> ${c.t}<span class="rv">Your answer: ${a?`#${a} ${S[a-1].name}`:'(blank)'}${ok?'':` · Correct: #${ans} ${byId[c.a].name}`}</span><span class="rv muted">${c.w}</span></div>`});
+   h+=`</div><div class="actions"><span class="result"><b>${r.score}</b> / ${CLUES.length} correct</span></div>`;
+   panel.innerHTML=h;markers(()=>'');return;
  }
+ const c=CLUES[r.i],pick=r.ans[r.i],last=r.i===CLUES.length-1;
+ let h=`<div><h2>What does it do?</h2><p class="how">Read the clue, then tap the matching part on the diagram or its number below. You can change your answer or go back until you finish the test.</p></div>`;
+ h+=`<div class="r2top"><div class="dots">${CLUES.map((_,k)=>`<i class="${k===r.i?'cur':r.ans[k]!=null?'ans':''}"></i>`).join('')}</div><span class="streak">${answered()[1]} / ${CLUES.length} answered</span></div>`;
+ h+=`<div class="clue"><span class="k">Clue ${r.i+1} of ${CLUES.length} · Who am I?</span><p>${c.t}</p></div>`;
+ h+=`<div class="pad">${S.map((_,k)=>{const n=k+1;return `<button data-n="${n}" class="${pick===n?'sel':''}" aria-pressed="${pick===n}" aria-label="Structure ${n}">${n}</button>`}).join('')}</div>`;
+ h+=`<div class="actions">${r.i>0?`<button class="btn ghost" id="back2">← Back</button>`:''}<button class="btn" id="go2">${last?'Next round →':'Next clue →'}</button>${pick?`<span class="result">Answer: #${pick} ${S[pick-1].name}</span>`:''}</div>`;
+ panel.innerHTML=h;
+ panel.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>answer2(+b.dataset.n));
+ markers(n=>n===pick?'filled':'');
  const q=id=>document.getElementById(id);
- if(q('redo2'))q('redo2').onclick=()=>{st.submitted=false;st.subMsg='';st.r2={i:0,res:[],pick:null,score:null,streak:0,best:0};render()};
- if(q('next2'))q('next2').onclick=()=>{st.round=2;render()};
+ q('go2').onclick=()=>{if(last){st.round=2;window.scrollTo({top:0,behavior:'smooth'})}else r.i++;render()};
+ if(q('back2'))q('back2').onclick=()=>{r.i--;render()};
 }
 
 /* ---------- Round 3 ---------- */
 function r3(){
- const r=st.r3;
- let h=`<div><h2>Who has it?</h2><p class="how">Not every microbe has every part from Fig. A. Tick each group that <em>usually</em> has the structure. A row only counts if all three boxes are right.</p></div>`;
+ const r=st.r3,done=st.done;
+ let h=`<div><h2>Who has it?</h2><p class="how">${done?'Your answers, checked. Each row explains the correct answer.':'Not every microbe has every part from Fig. A. Tick each group that <em>usually</em> has the structure. A row only counts if all three boxes are right.'}</p></div>`;
  h+=`<div class="tablewrap"><table class="sort"><thead><tr><th>Structure</th>${G.map(g=>`<th class="c g${g[0]}">${g[1]}</th>`).join('')}</tr></thead><tbody>`;
  R3.forEach(row=>{const p=r.pick[row.id];let rc='';
-   if(r.checked)rc=G.every(([k])=>p.has(k)===row.a.includes(k))?'ok':'bad';
-   h+=`<tr class="${rc}"><td>${row.name}${r.checked?`<span class="why">${row.w}</span>`:''}</td>${G.map(([k,name])=>{let cls='tog';
-     if(r.checked){const want=row.a.includes(k),has=p.has(k);if(want&&!has)cls+=' miss';if(!want&&has)cls+=' extra'}
-     return `<td class="c"><button class="${cls}" data-row="${row.id}" data-g="${k}" aria-pressed="${p.has(k)}" aria-label="${row.name}: ${name}" ${r.checked?'disabled':''}>${p.has(k)?'✓':''}</button></td>`}).join('')}</tr>`});
+   if(done)rc=G.every(([k])=>p.has(k)===row.a.includes(k))?'ok':'bad';
+   h+=`<tr class="${rc}"><td>${row.name}${done?`<span class="why">${row.w}</span>`:''}</td>${G.map(([k,name])=>{let cls='tog';
+     if(done){const want=row.a.includes(k),has=p.has(k);if(want&&!has)cls+=' miss';if(!want&&has)cls+=' extra'}
+     return `<td class="c"><button class="${cls}" data-row="${row.id}" data-g="${k}" aria-pressed="${p.has(k)}" aria-label="${row.name}: ${name}" ${done?'disabled':''}>${p.has(k)?'✓':''}</button></td>`}).join('')}</tr>`});
  h+=`</tbody></table></div>`;
- h+=`<div class="actions">${r.checked?`<button class="btn ghost" id="redo3">Try again</button><span class="result"><b>${r.score}</b> / ${R3.length} rows correct</span>`:`<button class="btn" id="check3">Check answers</button>`}</div>`;
- if(r.checked)h+=`<div class="legend">Red dashed box = you missed it. Solid red = it shouldn’t be ticked.</div>`;
+ if(done){
+   h+=`<div class="actions"><span class="result"><b>${r.score}</b> / ${R3.length} rows correct</span></div><div class="legend">Red dashed box = you missed it. Solid red = it shouldn’t be ticked.</div>`;
+ }else if(st.confirm){
+   const an=answered(),gaps=[];
+   if(an[0]<15)gaps.push(`${15-an[0]} blank in Round 1`);if(an[1]<CLUES.length)gaps.push(`${CLUES.length-an[1]} unanswered in Round 2`);if(an[2]<R3.length)gaps.push(`${R3.length-an[2]} untouched rows in Round 3`);
+   h+=`<div class="confirm"><b>Finish the test?</b><p>You can’t change your answers after this. Your score and the correct answers will be shown.${gaps.length?` <strong>You still have ${gaps.join(', ')}.</strong>`:''}</p><div class="actions"><button class="btn" id="yes3">Yes, finish and submit</button><button class="btn ghost" id="no3">Keep working</button></div></div>`;
+ }else{
+   h+=`<div class="actions"><button class="btn" id="fin3">Finish test</button><span class="result">${answered()[2]} / ${R3.length} rows answered</span></div>`;
+ }
  panel.innerHTML=h;
  panel.querySelectorAll('.tog').forEach(b=>b.onclick=()=>{const s=r.pick[b.dataset.row];start();s.has(b.dataset.g)?s.delete(b.dataset.g):s.add(b.dataset.g);render()});
  const q=id=>document.getElementById(id);
- if(q('check3'))q('check3').onclick=()=>{r.checked=true;r.score=R3.filter(row=>G.every(([k])=>r.pick[row.id].has(k)===row.a.includes(k))).length;render()};
- if(q('redo3'))q('redo3').onclick=()=>{st.submitted=false;st.subMsg='';r.checked=false;r.score=null;R3.forEach(x=>r.pick[x.id]=new Set());render()};
+ if(q('fin3'))q('fin3').onclick=()=>{st.confirm=true;render();q('yes3').focus()};
+ if(q('no3'))q('no3').onclick=()=>{st.confirm=false;render()};
+ if(q('yes3'))q('yes3').onclick=finish;
 }
 
 /* ---------- Leaderboard ---------- */
 async function submitScore(){
  const nm=st.name,sec=st.sec;
  const msg=t=>{st.subMsg=t;const m=document.getElementById('subMsg');if(m)m.textContent=t};
- if(!nm||!sec){msg('Enter your name first.');showStart();return}
- const b=document.getElementById('submitLB');if(b)b.disabled=true;msg('Submitting…');
+ if(st.submitted)return;
+ const b=document.getElementById('submitLB');if(b)b.disabled=true;st.subFail=false;msg('Saving your score to the leaderboard…');
  try{await sb(CONFIG.TABLE,{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({name:nm,section:sec,r1:st.r1.score,r2:st.r2.score,r3:st.r3.score,seconds:elapsed()})});
-   st.submitted=true;st.lb.sec=sec;msg('Submitted!');summary();loadLB();
- }catch(e){if(b)b.disabled=false;msg('Couldn’t submit. Details: '+String(e&&e.message||e).slice(0,160))}
+   st.submitted=true;st.lb.sec=sec;st.subMsg='Saved to the leaderboard.';summary();loadLB();
+ }catch(e){st.subFail=true;st.subMsg='Couldn’t save your score. Details: '+String(e&&e.message||e).slice(0,160);summary()}
 }
 async function loadLB(){
  if(!LB_ON||st.lb.loading)return;st.lb.loading=true;if(st.round===3)render();
@@ -577,17 +602,18 @@ async function loadLB(){
 }
 setInterval(()=>{if(st.round===3&&!document.hidden)loadLB()},20000);
 function lb(){
- const L=st.lb;let h=`<div><h2>Leaderboard</h2><p class="how">Each student’s best attempt. Ties go to the faster time.</p></div>`;
+ const L=st.lb;let h=`<div><h2>Leaderboard</h2><p class="how">Only each student’s first attempt counts. Ties go to the faster time.</p></div>`;
  if(!LB_ON){panel.innerHTML=h+`<div class="note">The leaderboard isn’t connected yet. Your teacher needs to add the Supabase settings to this page.</div>`;markers(()=>'');return}
  const rows=L.rows||[];const secs=[...new Set(rows.map(r=>r.section))].sort();
- const seen=new Set(),best=[];rows.forEach(r=>{const k=r.name.toLowerCase()+'|'+r.section;if(!seen.has(k)){seen.add(k);best.push(r)}});
+ const first={};rows.forEach(r=>{const k=r.name.toLowerCase()+'|'+r.section;if(!first[k]||r.created_at<first[k].created_at)first[k]=r});
+ const best=Object.values(first).sort((a,b)=>b.total-a.total||(a.seconds??1e9)-(b.seconds??1e9)||(a.created_at<b.created_at?-1:1));
  const shown=best.filter(r=>L.sec==='all'||r.section===L.sec).slice(0,50);
  const me=st.name.toLowerCase()+'|'+st.sec;
  h+=`<div class="lbbar"><label>Section <select id="lbSec"><option value="all">All sections</option>${secs.map(x=>`<option value="${esc(x)}" ${L.sec===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><button class="btn ghost" id="lbRefresh">${L.loading?'Loading…':'Refresh'}</button></div>`;
  if(L.err)h+=`<div class="note bad">${esc(L.err)}</div>`;
- if(L.rows&&!shown.length)h+=`<div class="note">No scores yet${L.sec!=='all'?' for '+esc(L.sec):''}. Finish all three rounds and hit “Submit to leaderboard” to be first.</div>`;
+ if(L.rows&&!shown.length)h+=`<div class="note">No scores yet${L.sec!=='all'?' for '+esc(L.sec):''}. Scores appear here when students finish the test.</div>`;
  else if(!L.rows&&!L.err)h+=`<div class="note">Loading scores…</div>`;
- else h+=`<div class="lbwrap"><table class="lb"><thead><tr><th>#</th><th>Name</th><th>Section</th><th class="num">Score</th><th class="num">Time</th></tr></thead><tbody>${shown.map((r,i)=>`<tr class="${(r.name.toLowerCase()+'|'+r.section)===me?'me':''}"><td><span class="rk ${i<3?'r'+(i+1):''}">${i+1}</span></td><td class="nm">${esc(r.name)}</td><td>${esc(r.section)}</td><td class="num"><b>${r.total}</b> / 32</td><td class="num">${mmss(r.seconds)}</td></tr>`).join('')}</tbody></table></div>`;
+ else if(L.rows)h+=`<div class="lbwrap"><table class="lb"><thead><tr><th>#</th><th>Name</th><th>Section</th><th class="num">Score</th><th class="num">Time</th></tr></thead><tbody>${shown.map((r,i)=>`<tr class="${(r.name.toLowerCase()+'|'+r.section)===me?'me':''}"><td><span class="rk ${i<3?'r'+(i+1):''}">${i+1}</span></td><td class="nm">${esc(r.name)}</td><td>${esc(r.section)}</td><td class="num"><b>${r.total}</b> / 32</td><td class="num">${mmss(r.seconds)}</td></tr>`).join('')}</tbody></table></div>`;
  panel.innerHTML=h;markers(()=>'');
  const sel=document.getElementById('lbSec');if(sel)sel.onchange=()=>{L.sec=sel.value;render()};
  const rf=document.getElementById('lbRefresh');if(rf)rf.onclick=loadLB;
